@@ -1,47 +1,61 @@
 import { FieldAppSDK } from '@contentful/app-sdk';
 import { Paragraph } from '@contentful/f36-components';
-import { /* useCMA, */ useAutoResizer, useSDK } from '@contentful/react-apps-toolkit';
+import {
+  /* useCMA, */ useAutoResizer,
+  useSDK,
+} from '@contentful/react-apps-toolkit';
 import axios from 'axios';
 import { EntryProps, KeyValueMap } from 'contentful-management';
 import { useEffect, useState } from 'react';
+import ImageDisplay from '../components/Image';
 const PIXA_API_KEY = '46333734-3d443a8f1d12cf7decd891fec';
 
 const Field = () => {
-  useAutoResizer({ absoluteElements: true })
+  useAutoResizer({ absoluteElements: true });
   const sdk = useSDK<FieldAppSDK>();
-  const entryId: string = sdk.ids.entry
-  const [baseEntry, setBaseEntry] = useState<EntryProps<KeyValueMap>>()
+  const entryId: string = sdk.ids.entry;
+  const [baseEntry, setBaseEntry] = useState<EntryProps<KeyValueMap>>();
   const cma = sdk.cma;
-  /*
-     To use the cma, inject it as follows.
-     If it is not needed, you can remove the next line.
-  */
-  // const cma = useCMA();
 
   const [images, setImages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectImage, setSelectImage] = useState('');
 
+  useEffect(() => {
+    const updateImage = async () => {
+      if (!baseEntry) return;
+      const entry: EntryProps<KeyValueMap> = { ...baseEntry };
+      console.log(entry);
+      if(selectImage) {
+        baseEntry.fields['image'] = {
+          'en-US': selectImage,
+        }
+      } else {
+        delete baseEntry.fields['image'];
+      }
+      const updatedEntry = await cma.entry.update({ entryId: entryId }, entry);
+      if (updatedEntry) setBaseEntry(updatedEntry);
+    };
+    updateImage();
+  }, [selectImage]);
+
   const handleImageSelect = async (image) => {
-    setSelectImage(image);
-    if (!baseEntry) return
-    const entry: EntryProps<KeyValueMap> = { ...baseEntry }
-    console.log(entry)
-    baseEntry.fields['image'] = {
-      'en-US': image
+    if(selectImage) {
+      setSelectImage('');
+      return;
     }
-    const updatedEntry = await cma.entry.update({ entryId: entryId }, entry)
-    if(updatedEntry) setBaseEntry(updatedEntry)
-  }
+    setSelectImage(image);
+  };
 
   useEffect(() => {
     const fetchEntry = async (entryId: string) => {
-      const entry = await cma.entry.get({ entryId: entryId })
-      console.log(entry)
-      setBaseEntry(entry)
-    }
-    fetchEntry(entryId)
-  }, [])
+      const entry = await cma.entry.get({ entryId: entryId });
+      console.log(entry);
+      if(entry.fields['image']) setSelectImage(entry.fields['image']['en-US']);
+      setBaseEntry(entry);
+    };
+    fetchEntry(entryId);
+  }, []);
 
   const searchImages = async () => {
     try {
@@ -57,8 +71,17 @@ const Field = () => {
       console.error(error);
     }
   };
+
   return (
     <>
+      <div>
+        {selectImage ? (
+          <div>
+            <p>attached image:</p>
+            <ImageDisplay model={selectImage} handleClick={handleImageSelect}/>
+          </div>
+        ) : null}
+      </div>
       <p>Search for an image:</p>
       <input
         type='text'
@@ -68,14 +91,7 @@ const Field = () => {
       <button onClick={searchImages}>Search</button>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {images.map((image) => (
-          <div key={image.id} style={{ margin: '10px'}}>
-            <img
-              src={image.previewURL}
-              alt={image.tags}
-              style={{ cursor: 'pointer', width: '200px', height:'150px'}}
-              onClick={() => handleImageSelect(image)}
-            />
-          </div>
+          <ImageDisplay key={image.id} model={image} handleClick={handleImageSelect} />
         ))}
       </div>
       <Paragraph>Hello Entry Field Component (AppId: {sdk.ids.app})</Paragraph>

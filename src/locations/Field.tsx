@@ -22,8 +22,16 @@ const Field = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectImage, setSelectImage] = useState('');
 
-  const handleImageSelect = (image) =>{
+  const handleImageSelect = async (image) => {
     setSelectImage(image);
+    if (!baseEntry) return
+    const entry: EntryProps<KeyValueMap> = { ...baseEntry }
+    console.log(entry)
+    baseEntry.fields['image'] = {
+      'en-US': image
+    }
+    const updatedEntry = await cma.entry.update({ entryId: entryId }, entry)
+    if(updatedEntry) setBaseEntry(updatedEntry)
   }
 
   useEffect(() => {

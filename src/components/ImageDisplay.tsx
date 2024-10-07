@@ -1,6 +1,13 @@
 import './ImageDisplay.css';
+import { ImageModel } from '../locations/Field';
 
-const ImageDisplay = ({ model, handleClick, isPreview = true }) => {
+export interface ImageDisplayProps {
+  model: ImageModel;
+  handleClick: (model: ImageModel) => void;
+  isPreview?: boolean;
+}
+
+const ImageDisplay = ({ model, handleClick, isPreview = true }: ImageDisplayProps) => {
   return (
     <div className='image-container'>
       <img

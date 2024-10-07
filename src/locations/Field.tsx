@@ -3,10 +3,22 @@ import { Paragraph } from '@contentful/f36-components';
 import { useAutoResizer, useSDK } from '@contentful/react-apps-toolkit';
 import axios from 'axios';
 import { EntryProps, KeyValueMap } from 'contentful-management';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import ImageDisplay from '../components/ImageDisplay';
 import './Field.css';
 const PIXA_API_KEY = '46333734-3d443a8f1d12cf7decd891fec';
+
+export interface PixabayResponse {
+  total: number;
+  totalHits: number;
+  hits: ImageModel[];
+}
+export interface ImageModel {
+  id: number;
+  previewURL: string;
+  webformatURL: string;
+  alt: string;
+}
 
 const Field = () => {
   useAutoResizer({ absoluteElements: true });
@@ -15,9 +27,9 @@ const Field = () => {
   const [baseEntry, setBaseEntry] = useState<EntryProps<KeyValueMap>>();
   const cma = sdk.cma;
 
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<ImageModel[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectImage, setSelectImage] = useState('');
+  const [selectImage, setSelectImage] = useState<ImageModel>();
 
   useEffect(() => {
     const updateImage = async () => {
@@ -37,12 +49,12 @@ const Field = () => {
     updateImage();
   }, [selectImage]);
 
-  const handleImageSelect = async (image) => {
+  const handleImageSelect = async (image: ImageModel) => {
     setSelectImage(image);
   };
 
   const handleDeselectImage = () => {
-    setSelectImage('');
+    setSelectImage(undefined);
   }
 
   useEffect(() => {
@@ -55,10 +67,11 @@ const Field = () => {
     fetchEntry(entryId);
   }, []);
 
-  const searchImages = async (e) => {
+  // set e as event type
+  const searchImages = async (e: FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      const response = await axios.get(
+      const response = await axios.get<PixabayResponse>(
         `https://pixabay.com/api/?key=${PIXA_API_KEY}&q=${encodeURIComponent(
           searchQuery
         )}&image_type=photo`

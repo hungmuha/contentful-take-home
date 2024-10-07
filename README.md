@@ -82,3 +82,18 @@ to find out more.
 The app is deployed in Contentful
 Installing link to the app in Contentful:
 https://app.contentful.com/deeplink?link=apps&id=4Tx3xEhI7taGq2RjCGbCQp
+
+## Thinking process for this test
+1. I have created a new app in Contentful and added the app to the space.
+2. I created a content model in this case called Image Selector with the field called image as JSON object.
+3. From here I can install the app to the space and imbedded the app to the content model.
+4. As instruction, I developed in Field.tsx and I used the CMA to retrieve the entry using the EntryId
+5. I break the app down to 2 main portion the searching image section and the selected image section.
+6. I abstracted out the imageDisplay component to make it reusable. I give it an interface to make it easier to work with.
+7. I created a couple interfaces for the api response and the image object to make it easier to work with.
+8. As data come back from the Pixabay, I set the data to the state and pass it down to the imageDisplay component.
+9. I created a search bar to search for the image and display the image in the imageDisplay component. I found it easier with a search bar to search for the image vs just browsing through the images.
+10. Editor can click the image returned from pixabay to select it and it will display in the selected image section and also attached it to the Entry via the CMA, the Entry is updated to Contentful.
+11. I make a simple feature by clicking the selectedImage to deselect the image. Although I can spend a little more time to make it more user friendly with a deselect button.
+
+

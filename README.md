@@ -77,3 +77,8 @@ to find out more.
 ## Learn More
 
 [Read more](https://www.contentful.com/developers/docs/extensibility/app-framework/create-contentful-app/) and check out the video on how to use the CLI.
+
+## Note for collaborators/developers
+The app is deployed in Contentful
+Installing link to the app in Contentful:
+https://app.contentful.com/deeplink?link=apps&id=4Tx3xEhI7taGq2RjCGbCQp

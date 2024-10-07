@@ -6,6 +6,8 @@ import { EntryProps, KeyValueMap } from 'contentful-management';
 import { FormEvent, useEffect, useState } from 'react';
 import ImageDisplay from '../components/ImageDisplay';
 import './Field.css';
+
+// this is not good practice, but it's fine for this example since it is a free API key
 const PIXA_API_KEY = '46333734-3d443a8f1d12cf7decd891fec';
 
 export interface PixabayResponse {

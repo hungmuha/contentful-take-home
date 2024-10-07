@@ -7,8 +7,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import ImageDisplay from '../components/ImageDisplay';
 import './Field.css';
 
-// this is not good practice, but it's fine for this example since it is a free API key
-const PIXA_API_KEY = '46333734-3d443a8f1d12cf7decd891fec';
+// read the API key from the environment variables
+const PIXA_API_KEY =import.meta.env.PIXA_API_KEY;
 
 export interface PixabayResponse {
   total: number;

@@ -1,13 +1,11 @@
 import { FieldAppSDK } from '@contentful/app-sdk';
 import { Paragraph } from '@contentful/f36-components';
-import {
-  /* useCMA, */ useAutoResizer,
-  useSDK,
-} from '@contentful/react-apps-toolkit';
+import { useAutoResizer, useSDK } from '@contentful/react-apps-toolkit';
 import axios from 'axios';
 import { EntryProps, KeyValueMap } from 'contentful-management';
 import { useEffect, useState } from 'react';
-import ImageDisplay from '../components/Image';
+import ImageDisplay from '../components/ImageDisplay';
+import './Field.css';
 const PIXA_API_KEY = '46333734-3d443a8f1d12cf7decd891fec';
 
 const Field = () => {
@@ -26,10 +24,10 @@ const Field = () => {
       if (!baseEntry) return;
       const entry: EntryProps<KeyValueMap> = { ...baseEntry };
       console.log(entry);
-      if(selectImage) {
+      if (selectImage) {
         baseEntry.fields['image'] = {
           'en-US': selectImage,
-        }
+        };
       } else {
         delete baseEntry.fields['image'];
       }
@@ -40,26 +38,26 @@ const Field = () => {
   }, [selectImage]);
 
   const handleImageSelect = async (image) => {
-    if(selectImage) {
-      setSelectImage('');
-      return;
-    }
     setSelectImage(image);
   };
+
+  const handleDeselectImage = () => {
+    setSelectImage('');
+  }
 
   useEffect(() => {
     const fetchEntry = async (entryId: string) => {
       const entry = await cma.entry.get({ entryId: entryId });
       console.log(entry);
-      if(entry.fields['image']) setSelectImage(entry.fields['image']['en-US']);
+      if (entry.fields['image']) setSelectImage(entry.fields['image']['en-US']);
       setBaseEntry(entry);
     };
     fetchEntry(entryId);
   }, []);
 
-  const searchImages = async () => {
+  const searchImages = async (e) => {
     try {
-      console.log(searchQuery);
+      e.preventDefault();
       const response = await axios.get(
         `https://pixabay.com/api/?key=${PIXA_API_KEY}&q=${encodeURIComponent(
           searchQuery
@@ -73,29 +71,37 @@ const Field = () => {
   };
 
   return (
-    <>
-      <div>
-        {selectImage ? (
-          <div>
-            <p>attached image:</p>
-            <ImageDisplay model={selectImage} handleClick={handleImageSelect}/>
-          </div>
-        ) : null}
-      </div>
-      <p>Search for an image:</p>
-      <input
-        type='text'
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      <button onClick={searchImages}>Search</button>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+    <div className='image-app'>
+      <h3>Search for an image</h3>
+      <form onSubmit={searchImages} className="search-bar">
+        <input
+          type="text"
+          placeholder="Type the image you want..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        <button type="submit" className="search-button">Search</button>
+      </form>
+      
+      <div className='image-collage'>
         {images.map((image) => (
-          <ImageDisplay key={image.id} model={image} handleClick={handleImageSelect} />
+          <ImageDisplay
+            key={image.id}
+            model={image}
+            handleClick={handleImageSelect}
+            isPreview={true}
+          />
         ))}
       </div>
-      <Paragraph>Hello Entry Field Component (AppId: {sdk.ids.app})</Paragraph>
-    </>
+
+      {selectImage ? (
+        <div className="selected-image-container">
+          <h3>Selected Image</h3>
+          <ImageDisplay model={selectImage} handleClick={handleDeselectImage} isPreview={false}/>
+        </div>
+      ) : null}
+    </div>
   );
 };
 

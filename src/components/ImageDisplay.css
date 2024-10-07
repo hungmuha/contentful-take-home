@@ -1,0 +1,23 @@
+.preview-image {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  object-fit: contain; /* Maintain aspect ratio, fit inside the container */
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.full-image {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.image-container {
+  flex: 1 1 auto; /* Each image takes up available space but maintains its aspect ratio */
+  min-width: 100px; /* Ensures a minimum width for the images */
+  transition: transform 0.3s ease;
+}

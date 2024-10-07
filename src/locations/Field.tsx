@@ -54,7 +54,7 @@ const Field = () => {
 
   const handleDeselectImage = () => {
     setSelectImage(undefined);
-  }
+  };
 
   useEffect(() => {
     const fetchEntry = async (entryId: string) => {
@@ -82,25 +82,20 @@ const Field = () => {
 
   return (
     <div className='image-app'>
-        {/* TODO: add tool tip to image for instruction if clicked would deselect image*/}
-        {selectImage ? (
-        <div className="selected-image-container">
-          <h3>Selected Image</h3>
-          <ImageDisplay model={selectImage} handleClick={handleDeselectImage} isPreview={false}/>
-        </div>
-      ) : null}
       <h3>Search for an image</h3>
-      <form onSubmit={searchImages} className="search-bar">
+      <form onSubmit={searchImages} className='search-bar'>
         <input
-          type="text"
-          placeholder="Type the image you want..."
+          type='text'
+          placeholder='Type the image you want...'
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
+          className='search-input'
         />
-        <button type="submit" className="search-button">Search</button>
+        <button type='submit' className='search-button'>
+          Search
+        </button>
       </form>
-      
+
       <div className='image-collage'>
         {images.map((image) => (
           <ImageDisplay
@@ -111,6 +106,17 @@ const Field = () => {
           />
         ))}
       </div>
+      {/* TODO: add tool tip to image for instruction if clicked would deselect image*/}
+      {selectImage ? (
+        <div className='selected-image-container'>
+          <h3>Selected Image</h3>
+          <ImageDisplay
+            model={selectImage}
+            handleClick={handleDeselectImage}
+            isPreview={false}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

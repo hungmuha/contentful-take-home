@@ -35,7 +35,6 @@ const Field = () => {
     const updateImage = async () => {
       if (!baseEntry) return;
       const entry: EntryProps<KeyValueMap> = { ...baseEntry };
-      console.log(entry);
       if (selectImage) {
         baseEntry.fields['image'] = {
           'en-US': selectImage,
@@ -60,7 +59,6 @@ const Field = () => {
   useEffect(() => {
     const fetchEntry = async (entryId: string) => {
       const entry = await cma.entry.get({ entryId: entryId });
-      console.log(entry);
       if (entry.fields['image']) setSelectImage(entry.fields['image']['en-US']);
       setBaseEntry(entry);
     };
@@ -76,7 +74,6 @@ const Field = () => {
           searchQuery
         )}&image_type=photo`
       );
-      console.log(response.data.hits);
       setImages(response.data.hits);
     } catch (error) {
       console.error(error);

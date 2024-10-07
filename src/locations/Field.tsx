@@ -1,5 +1,4 @@
 import { FieldAppSDK } from '@contentful/app-sdk';
-import { Paragraph } from '@contentful/f36-components';
 import { useAutoResizer, useSDK } from '@contentful/react-apps-toolkit';
 import axios from 'axios';
 import { EntryProps, KeyValueMap } from 'contentful-management';
@@ -7,8 +6,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import ImageDisplay from '../components/ImageDisplay';
 import './Field.css';
 
-// read the API key from the environment variables
-const PIXA_API_KEY =import.meta.env.PIXA_API_KEY;
+const PIXA_API_KEY = import.meta.env.PIXA_API_KEY;
 
 export interface PixabayResponse {
   total: number;
@@ -106,7 +104,7 @@ const Field = () => {
           />
         ))}
       </div>
-
+      {/* TODO: add tool tip to image for instruction if clicked would deselect image*/}
       {selectImage ? (
         <div className="selected-image-container">
           <h3>Selected Image</h3>

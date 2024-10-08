@@ -95,5 +95,6 @@ https://app.contentful.com/deeplink?link=apps&id=4Tx3xEhI7taGq2RjCGbCQp
 9. I created a search bar to search for the image and display the image in the imageDisplay component. I found it easier with a search bar to search for the image vs just browsing through the images.
 10. Editor can click the image returned from pixabay to select it and it will display in the selected image section and also attached it to the Entry via the CMA, the Entry is updated to Contentful.
 11. I make a simple feature by clicking the selectedImage to deselect the image. Although I can spend a little more time to make it more user friendly with a deselect button.
+12. I abstracted out the service for the api call to make it easier to work with and also to make it easier to test.
 
 

@@ -1,35 +1,25 @@
+import { FormEvent, useEffect, useState } from 'react';
 import { FieldAppSDK } from '@contentful/app-sdk';
 import { useAutoResizer, useSDK } from '@contentful/react-apps-toolkit';
-import axios from 'axios';
 import { EntryProps, KeyValueMap } from 'contentful-management';
-import { FormEvent, useEffect, useState } from 'react';
+import { Button, Modal, Subheading, Text } from '@contentful/f36-components';
 import ImageDisplay from '../components/ImageDisplay';
+import getImages, {
+  ImageModel,
+} from '../services/PixabayImage';
 import './Field.css';
-
-const PIXA_API_KEY = import.meta.env.PIXA_API_KEY;
-
-export interface PixabayResponse {
-  total: number;
-  totalHits: number;
-  hits: ImageModel[];
-}
-export interface ImageModel {
-  id: number;
-  previewURL: string;
-  webformatURL: string;
-  alt: string;
-}
 
 const Field = () => {
   useAutoResizer();
   const sdk = useSDK<FieldAppSDK>();
   const entryId: string = sdk.ids.entry;
-  const [baseEntry, setBaseEntry] = useState<EntryProps<KeyValueMap>>();
   const cma = sdk.cma;
 
+  const [baseEntry, setBaseEntry] = useState<EntryProps<KeyValueMap>>();
   const [images, setImages] = useState<ImageModel[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectImage, setSelectImage] = useState<ImageModel>();
+  const [isShown, setShown] = useState(false);
 
   useEffect(() => {
     const updateImage = async () => {
@@ -48,14 +38,6 @@ const Field = () => {
     updateImage();
   }, [selectImage]);
 
-  const handleImageSelect = async (image: ImageModel) => {
-    setSelectImage(image);
-  };
-
-  const handleDeselectImage = () => {
-    setSelectImage(undefined);
-  };
-
   useEffect(() => {
     const fetchEntry = async (entryId: string) => {
       const entry = await cma.entry.get({ entryId: entryId });
@@ -65,56 +47,82 @@ const Field = () => {
     fetchEntry(entryId);
   }, []);
 
+  const openModal = async () => {
+    setShown(true);
+    const images = await getImages(searchQuery);
+    setImages(images);
+  };
+
+  const handleImageSelect = async (image: ImageModel) => {
+    setSelectImage(image);
+  };
+
+  const handleDeselectImage = () => {
+    setSelectImage(undefined);
+  };
+
+
   // set e as event type
   const searchImages = async (e: FormEvent<HTMLFormElement>) => {
-    try {
       e.preventDefault();
-      const response = await axios.get<PixabayResponse>(
-        `https://pixabay.com/api/?key=${PIXA_API_KEY}&q=${encodeURIComponent(
-          searchQuery
-        )}&image_type=photo`
-      );
-      setImages(response.data.hits);
-    } catch (error) {
-      console.error(error);
-    }
+      const images = await getImages(searchQuery);
+      setImages(images);
   };
 
   return (
-    <div className='image-app'>
-      <h3>Search for an image</h3>
-      <form onSubmit={searchImages} className='search-bar'>
-        <input
-          type='text'
-          placeholder='Type the image you want...'
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className='search-input'
-        />
-        <button type='submit' className='search-button'>
-          Search
-        </button>
-      </form>
-
-      <div className='image-collage'>
-        {images.map((image) => (
-          <ImageDisplay
-            key={image.id}
-            model={image}
-            handleClick={handleImageSelect}
-            isPreview={true}
-          />
-        ))}
-      </div>
+    <div className={`image-app ${isShown ? 'show-modal' : ''}`}>
+      <Button onClick={openModal}>Open Image Selector</Button>
+      <Modal onClose={() => setShown(false)} isShown={isShown}>
+        {() => (
+          <>
+            <Modal.Header
+              title='Image Selector'
+              security='select image for entry'
+              onClose={() => setShown(false)}
+            />
+            <Modal.Content>
+              {/* TODO: add tool tip to image for instruction if clicked would deselect image*/}
+              {selectImage ? (
+                <div className='selected-image-container'>
+                  <Subheading>Selected Image</Subheading>
+                  <ImageDisplay
+                    model={selectImage}
+                    handleClick={handleDeselectImage}
+                    isPreview={false}
+                  />
+                </div>
+              ) : null}
+              <Subheading>Search for images</Subheading>
+              <form onSubmit={searchImages} className='search-bar'>
+                <input
+                  type='text'
+                  placeholder='Type the image you want...'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className='search-input'
+                />
+                <button type='submit' className='search-button'>
+                  Search
+                </button>
+              </form>
+              <div className='image-collage'>
+                {images.map((image) => (
+                  <ImageDisplay
+                    key={image.id}
+                    model={image}
+                    handleClick={handleImageSelect}
+                    isPreview={true}
+                  />
+                ))}
+              </div>
+            </Modal.Content>
+          </>
+        )}
+      </Modal>
       {/* TODO: add tool tip to image for instruction if clicked would deselect image*/}
       {selectImage ? (
         <div className='selected-image-container'>
-          <h3>Selected Image</h3>
-          <ImageDisplay
-            model={selectImage}
-            handleClick={handleDeselectImage}
-            isPreview={false}
-          />
+          <Subheading>Selected Image URL: <Text>{selectImage.previewURL}</Text></Subheading>
         </div>
       ) : null}
     </div>

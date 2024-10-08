@@ -1,5 +1,5 @@
+import { ImageModel } from '../services/PixabayImage';
 import './ImageDisplay.css';
-import { ImageModel } from '../locations/Field';
 
 export interface ImageDisplayProps {
   model: ImageModel;
